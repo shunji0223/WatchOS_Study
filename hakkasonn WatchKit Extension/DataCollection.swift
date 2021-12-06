@@ -32,7 +32,7 @@ struct DataCollection {
         return labelText
     }
     
-    func GetStep() -> String {
+    func GetStepAsync(_ after:@escaping (String) -> ()) {
         var labelText: String = ""
         if HKHealthStore.isHealthDataAvailable() {
             let readTypes = Set([
@@ -59,12 +59,22 @@ struct DataCollection {
                     print("step is \(tmpResults)")
                     step = (tmpResults as AnyObject).doubleValue(for: HKUnit.count())
                     labelText = String(step)
-                    
+                    after(labelText)
                 }
                 healthStore.execute(query)
             })
         }
-        return labelText
+    }
+    
+    func GetStepSync() -> String {
+        var result: String?
+        let semaphore = DispatchSemaphore(value: 0)
+        GetStepAsync() { (response: String) in
+                result = response
+                semaphore.signal()
+            }
+        semaphore.wait()
+        return result!
     }
     
 }

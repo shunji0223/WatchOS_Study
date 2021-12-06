@@ -27,7 +27,7 @@ struct ContentView: View {
                         TextField("あなたの名前", text: $name).foregroundColor(.white)
                     }
                     Button("get"){
-                        self.name = DataCollection().GetStep()
+                        self.name = DataCollection().GetStepSync()
                     }
                 }
             }
